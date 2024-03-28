@@ -52,4 +52,4 @@ jobs:
       - name: Deploy to QA
         run: |
           echo "Deploying to the QA environment."
-          echo "QA secret is: ${{ env.ENV_TEST_KEY }}"
+          echo "QA secret is: ${{ secrets[env.ENV_TEST_KEY] }}"
