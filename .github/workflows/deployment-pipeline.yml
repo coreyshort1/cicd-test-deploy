@@ -38,3 +38,4 @@ jobs:
       - name: Deploy to Develop
         run: |
           echo "Deploying to the Develop environment."
+          echo ${{ secrets.ENV_TEST_KEY }}
