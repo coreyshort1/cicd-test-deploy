@@ -34,12 +34,12 @@ jobs:
     if: success() # Only deploy if tests passed
     env:
       name: develop
-      env_test_key: ${{ secrets.ENV_TEST_key }}
+      #develop_test_key: ${{ secrets.DEVELOP_TEST_KEY }}
     steps:
       - name: Deploy to Develop
         run: |
           echo "Deploying to the Develop environment."
-          echo "Develop secret is: ${{ secrets.env_test_key }}"
+          echo "Develop secret is: ${{ secrets.DEVELOP_TEST_KEY }}"
  
   deploy-qa:
     name: Deploy QA
@@ -47,9 +47,9 @@ jobs:
     needs: deploy-develop
     env:
       name: qa
-      env_test_key: ${{ secrets.ENV_TEST_KEY }}
+      #env_test_key: ${{ secrets.ENV_TEST_KEY }}
     steps:
       - name: Deploy to QA
         run: |
           echo "Deploying to the QA environment."
-          echo "QA secret is: ${{ env.env_test_key }}"
+          echo "QA secret is: ${{ env.ENV_TEST_KEY }}"
