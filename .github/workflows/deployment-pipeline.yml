@@ -36,11 +36,8 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Login Vercel
-        run: vercel login --token $VERCEL_TOKEN
-
       - name: Pull Vercel Project Settings
-        run: npx vercel pull --yes 
+        run: npx vercel pull --yes --token $VERCEL_TOKEN
       
       - name: Run Vercel Build
         run: npx vercel build
