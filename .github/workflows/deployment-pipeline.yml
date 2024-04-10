@@ -7,8 +7,8 @@ on:
       - feature/*
       - fix/*
 
-#env:
-#    NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+env:
+    VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
 jobs:
   run-unit-tests:
@@ -36,8 +36,11 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
+      - name: Login Vercel
+        run: vercel login --token $VERCEL_TOKEN
+
       - name: Pull Vercel Project Settings
-        run: npx vercel pull --yes
+        run: npx vercel pull --yes 
       
       - name: Run Vercel Build
         run: npx vercel build
