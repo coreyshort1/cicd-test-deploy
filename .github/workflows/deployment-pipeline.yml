@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: run-unit-tests
     steps:
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -56,7 +57,7 @@ jobs:
           cat ~/work/cicd-test-deploy/cicd-test-deploy/.vercel/project.json
       
       - name: Run Vercel Build
-        run: npx vercel build
+        run: npm run vercel-build
   
   # test auto-rebase against main. fail build if rebase conflict occurs
 
