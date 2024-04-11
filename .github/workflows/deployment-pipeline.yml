@@ -39,9 +39,10 @@ jobs:
       - name: Pull Vercel Project Settings
         # .vercel/.env.development.local
         # .vercel/.env.preview.local
+        # npx vercel env pull .env.development --token $VERCEL_TOKEN -> vercel link or configure differently
         run: |
-          npx vercel env pull .env.development --token $VERCEL_TOKEN
-          cat .env.development
+          npx vercel pull --yes --environment=development --token $VERCEL_TOKEN
+          cat .vercel/.env.development.local
           npx vercel pull --yes --environment=preview --token $VERCEL_TOKEN
           cat .vercel/.env.preview.local
           npx vercel pull --yes --environment=production --token $VERCEL_TOKEN
