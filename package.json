@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
-    "vercel-build": "next build"
+    "test": "jest"
   },
   "dependencies": {
     "next": "11.1.2",
