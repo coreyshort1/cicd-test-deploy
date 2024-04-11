@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - feature/*
+      - feature/* # add condition 
       - fix/*
 
 env:
@@ -37,7 +37,10 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pull Vercel Project Settings
-        run: npx vercel pull --yes --token $VERCEL_TOKEN
+        run: |
+          npx vercel pull --yes --token $VERCEL_TOKEN
+          cat .vercel/.env.development.local
+          cat ~/work/cicd-test-deploy/cicd-test-deploy/.vercel/project.json
       
       - name: Run Vercel Build
         run: npx vercel build
@@ -68,7 +71,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'serenaandlily/sl-testing-automation'
-          ref: main  # locally it's on Dev TODO: check running on main
+          ref: main  # locally it's on Develop. TODO: check running on main
           token: $${{ secrets.GITHUB_TOKEN }}
           path: 'sl-testing-automation'
       
