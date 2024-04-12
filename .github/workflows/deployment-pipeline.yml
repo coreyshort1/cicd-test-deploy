@@ -74,8 +74,8 @@ jobs:
     steps:
       - name: Deploy to Develop
         run: |
-          echo "Deploying to the Develop environment."
-          //echo "Develop secret is: ${{ secrets.DEVELOP_TEST_KEY }}"
+          echo "::notice Deploying to the Develop environment."
+          npx vercel deploy --token $VERCEL_TOKEN --local-config .env.development.local
   
   run-regression:
     name: Run Regression
