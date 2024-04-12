@@ -21,6 +21,8 @@ jobs:
         - uses: actions/setup-node@v3
           with:
             node-version: 16
+            cache: 'npm'
+            cache-dependency-path: package-lock.json
             registry-url: 'https://npm.pkg.github.com'
             #scope: '@serenaandlily'
         - name: npm install and test
@@ -34,10 +36,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          #scope: '@serenaandlily'
       - name: Install Vercel CLI
         run: |
-          npm install 
           npm install -g vercel@latest
+          npm ls
 
       - name: Pull Vercel Project Settings
         # npx vercel env pull .env.development --token $VERCEL_TOKEN -> vercel link or configure differently
