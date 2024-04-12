@@ -23,12 +23,10 @@ jobs:
             node-version: 16
             registry-url: 'https://npm.pkg.github.com'
             #scope: '@serenaandlily'
-        - name: npm install and build
+        - name: npm install and test
           run: |
             npm install
-            npm run build --if-present
             npm test
-            npm ls
   build:
     name: Build Artifact
     runs-on: ubuntu-latest
@@ -38,8 +36,8 @@ jobs:
       
       - name: Install Vercel CLI
         run: |
+          npm install 
           npm install -g vercel@latest
-          npm ls
 
       - name: Pull Vercel Project Settings
         # npx vercel env pull .env.development --token $VERCEL_TOKEN -> vercel link or configure differently
