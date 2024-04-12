@@ -72,11 +72,12 @@ jobs:
     env:
       name: develop
     steps:
+      - uses: actions/checkout@v3
       - name: Deploy to Develop
         run: |
-          echo "::notice Deploying to the Develop environment."
+          echo "::notice::Deploying to the Develop environment."
           npx vercel pull --yes --environment=development --token $VERCEL_TOKEN
-          npx vercel deploy --token $VERCEL_TOKEN --local-config .env.development.local
+          npx vercel deploy --token $VERCEL_TOKEN --local-config .vercel/.env.development.local
   
   run-regression:
     name: Run Regression
