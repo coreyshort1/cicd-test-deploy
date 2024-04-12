@@ -45,9 +45,9 @@ jobs:
           #scope: '@serenaandlily'
       - name: Install Vercel CLI
         run: |
+          npm install
           npm install -g vercel@latest
-          npm ls
-
+          
       - name: Pull Vercel Project Settings
         # npx vercel env pull .env.development --token $VERCEL_TOKEN -> vercel link or configure differently
         run: |
