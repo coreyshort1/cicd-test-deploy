@@ -75,6 +75,7 @@ jobs:
       - name: Deploy to Develop
         run: |
           echo "::notice Deploying to the Develop environment."
+          npx vercel pull --yes --environment=development --token $VERCEL_TOKEN
           npx vercel deploy --token $VERCEL_TOKEN --local-config .env.development.local
   
   run-regression:
