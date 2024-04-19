@@ -6,6 +6,8 @@ on:
       - main
       - feature/* # add condition 
       - fix/*
+    branches-ignore:
+      - feature/run-regression
 
 env:
     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
