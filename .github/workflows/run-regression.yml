@@ -15,7 +15,7 @@ jobs:
             uses: actions/checkout@v3
             with:
               repository: 'serenaandlily/sl-testing-automation'
-              ref: main  # locally it's on Develop. TODO: check running on main
+              ref: dev  # locally it's ran on dev. TODO: check running on main
               token: ${{ secrets.RELEASE_PIPELINE_TOKEN }}
               path: 'sl-testing-automation'
           
@@ -29,4 +29,5 @@ jobs:
           #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
     
           - name: Run Regression Suite
+            working-directory: sl-testing-automation
             run: mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=suites/panel/regression.xml
