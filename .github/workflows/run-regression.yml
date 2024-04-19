@@ -31,7 +31,7 @@ jobs:
           - name: Cache Maven dependencies
             uses: actions/cache@v2
             with:
-              path: ~/.m2/repository
+              path: /home/runner/.m2/repository
               key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
               restore-keys: |
                 ${{ runner.os }}-maven-
@@ -46,7 +46,7 @@ jobs:
               pwd
               ls -l
               ls -l ./test-output
-              ls -l ~/.m2/repository
+              ls -l /home/runner/.m2/repository
         
     
           #- name: Configure Environment
