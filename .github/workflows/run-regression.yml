@@ -16,7 +16,7 @@ jobs:
             with:
               repository: 'serenaandlily/sl-testing-automation'
               ref: main  # locally it's on Develop. TODO: check running on main
-              token: ${{ secrets.GITHUB_AUTOMATION_TOKEN }}
+              token: ${{ secrets.RELESE_PIPELINE_TOKEN }}
               path: 'sl-testing-automation'
           
           - name: Set up JDK 11
