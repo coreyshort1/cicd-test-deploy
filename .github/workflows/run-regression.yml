@@ -32,6 +32,11 @@ jobs:
               key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
               restore-keys: |
                 ${{ runner.os }}-maven-
+          
+          - name: Create Output Directories
+            run: |
+              mkdir -p test-output/xml
+              mkdir -p test-output/html
     
           #- name: Configure Environment
           #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
