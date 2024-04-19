@@ -45,5 +45,5 @@ jobs:
           #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
     
           - name: Run Regression Suite
-            #working-directory: sl-testing-automation
+            working-directory: sl-testing-automation
             run: mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=regression.xml
