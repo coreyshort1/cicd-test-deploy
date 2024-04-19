@@ -3,7 +3,7 @@ name: Run Regression
 on:
   push:
     branches:
-      - feature/run-regression
+      - run-regression
 
 jobs:
     run-regression:
@@ -16,7 +16,7 @@ jobs:
             with:
               repository: 'serenaandlily/sl-testing-automation'
               ref: main  # locally it's on Develop. TODO: check running on main
-              token: ${{ secrets.RELESE_PIPELINE_TOKEN }}
+              token: ${{ secrets.RELEASE_PIPELINE_TOKEN }}
               path: 'sl-testing-automation'
           
           - name: Set up JDK 11
