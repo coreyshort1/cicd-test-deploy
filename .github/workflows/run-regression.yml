@@ -38,4 +38,4 @@ jobs:
     
           - name: Run Regression Suite
             working-directory: sl-testing-automation
-            run: mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=suites/panel/regression.xml
+            run: mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=regression.xml
