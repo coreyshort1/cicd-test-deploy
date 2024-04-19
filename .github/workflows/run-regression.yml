@@ -25,8 +25,8 @@ jobs:
               distribution: 'adopt'
               java-version: '11'
     
-          - name: Configure Environment
-            run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
+          #- name: Configure Environment
+          #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
     
           - name: Run Regression Suite
             run: mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=suites/panel/regression.xml
