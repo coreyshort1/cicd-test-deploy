@@ -44,7 +44,7 @@ jobs:
               path: ~/.m2/repository
               key: serenaandlily-maven-regression-suite
               restore-keys: |
-                serenaandlily-maven-regression-suite-restore
+                serenaandlily-maven-regression-restore
     
           #- name: Configure Environment
           #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
@@ -53,4 +53,3 @@ jobs:
             working-directory: sl-testing-automation
             run: |
               mkdir -p ./test-output/xml
-              mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=regression.xml
