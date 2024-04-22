@@ -5,15 +5,7 @@ on:
   #  branches:
   #    - run-regression
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to run regression against'
-        required: true
-        default: 'dev'
-        type: choice
-        options:
-          - 'dev'
-          - 'qa'
+    
 
 jobs:
     run-regression:
