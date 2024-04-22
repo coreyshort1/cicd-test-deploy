@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - run-regression
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run regression against'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - 'dev'
+          - 'qa'
 
 jobs:
     run-regression:
@@ -34,7 +44,7 @@ jobs:
               path: /home/runner/.m2/repository
               key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
               restore-keys: |
-                ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+                ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-restore
     
           #- name: Configure Environment
           #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
