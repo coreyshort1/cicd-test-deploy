@@ -1,9 +1,9 @@
 name: Run Regression
 
 on:
-  push:
-    branches:
-      - run-regression
+  #push:
+  #  branches:
+  #    - run-regression
   workflow_dispatch:
     inputs:
       environment:
