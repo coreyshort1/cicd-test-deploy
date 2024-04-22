@@ -41,10 +41,10 @@ jobs:
           - name: Cache Maven dependencies
             uses: actions/cache@v2
             with:
-              path: /home/runner/.m2/repository
-              key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+              path: ~/.m2/repository
+              key: serenaandlily-maven-regression-suite
               restore-keys: |
-                ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-restore
+                serenaandlily-maven-regression-suite-restore
     
           #- name: Configure Environment
           #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
