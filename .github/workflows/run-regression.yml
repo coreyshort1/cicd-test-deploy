@@ -1,0 +1,55 @@
+name: Run Regression
+
+on:
+  push:
+    branches:
+      - run-regression
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run regression against'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - 'dev'
+          - 'qa'
+
+jobs:
+    run-regression:
+        name: Run Regression
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Regression Code
+            uses: actions/checkout@v3
+            with:
+              repository: 'serenaandlily/sl-testing-automation'
+              ref: dev  # locally it's ran on dev. TODO: check running on main
+              token: ${{ secrets.RELEASE_PIPELINE_TOKEN }}
+              path: 'sl-testing-automation'
+          
+          - name: Change working directory
+            run: cd sl-testing-automation
+          
+          - name: Set up JDK 11
+            uses: actions/setup-java@v2
+            with:
+              distribution: 'adopt'
+              java-version: '11'
+          
+          - name: Cache Maven dependencies
+            uses: actions/cache@v2
+            with:
+              path: ~/.m2/repository
+              key: serenaandlily-maven-regression-suite
+              restore-keys: |
+                serenaandlily-maven-regression-restore
+    
+          #- name: Configure Environment
+          #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
+    
+          - name: Run Regression Suite
+            working-directory: sl-testing-automation
+            run: |
+              mkdir -p ./test-output/xml
+              mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=regression.xml
