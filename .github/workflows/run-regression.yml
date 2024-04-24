@@ -1,17 +1,24 @@
 name: Run Regression
 
 on:
-  #push:
-  #  branches:
-  #    - run-regression
+  push:
+    branches:
+      - run-regression
   workflow_dispatch:
-    
+    inputs:
+      environment:
+        description: 'Environment to run regression against'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - 'dev'
+          - 'qa'
 
 jobs:
     run-regression:
         name: Run Regression
         runs-on: ubuntu-latest
-        # name: Run Manual Regression on: workflow_dispatch: inputs: name: choice: drop down with dev or qa
         steps:
           - name: Checkout Regression Code
             uses: actions/checkout@v3
@@ -45,3 +52,4 @@ jobs:
             working-directory: sl-testing-automation
             run: |
               mkdir -p ./test-output/xml
+              mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=regression.xml
