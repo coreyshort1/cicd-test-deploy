@@ -44,9 +44,6 @@ jobs:
     name: Deploy Develop
     runs-on: ubuntu-latest
     needs: run-unit-tests
-    if: success() # Only deploy if tests passed
-    env:
-      name: develop
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -72,14 +69,42 @@ jobs:
       - name: Deploy to Vercel
         run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
   
+  deploy-staging:
+    name: Deploy Staging
+    runs-on: ubuntu-latest
+    needs: deploy-develop
+    if: github.ref == 'refs/heads/main' # Only run on main branch
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use node cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          #scope: '@serenaandlily'
+        
+      - name: Deploy to Staging
+        run: echo "Deploying to the Staging environment."
+      
+      - name: Pull Vercell environment variables
+        run: npx vercel pull --yes --environment=preview --token $VERCEL_TOKEN
+      
+      - name: Run Vercel build
+        run: npx vercel build --token $VERCEL_TOKEN
+      
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
+  
 
   deploy-production:
     name: Deploy Production
     runs-on: ubuntu-latest
     needs: deploy-develop
-    if: success()
-    env:
-      name: production
+    if: github.ref == 'refs/heads/main' # Only run on main branch
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -104,5 +129,3 @@ jobs:
       
       - name: Deploy to Vercel
         run: npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN
-
- 
