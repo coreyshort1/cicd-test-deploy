@@ -17,101 +17,115 @@ jobs:
     env:
         CI: true
     steps:
-        - uses: actions/checkout@v3
-        - uses: actions/setup-node@v3
+        - name: Checkout code
+          uses: actions/checkout@v3
+        
+        - name: Setup and cache node modules
+          uses: actions/setup-node@v3
           with:
             node-version: 16
             cache: 'npm'
             cache-dependency-path: package-lock.json
             registry-url: 'https://npm.pkg.github.com'
             #scope: '@serenaandlily'
-        - name: npm install and test
-          run: |
-            npm install
-            npm test
-  build:
-    name: Build Artifact
-    runs-on: ubuntu-latest
-    needs: run-unit-tests
-    steps:
-      - uses: actions/checkout@v3
-      
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
-          registry-url: 'https://npm.pkg.github.com'
-          #scope: '@serenaandlily'
-      - name: Install Vercel CLI
-        run: |
-          npm install
-          npm install -g vercel@latest
-
-      - name: Pull Vercel Project Settings
-        # npx vercel env pull .env.development --token $VERCEL_TOKEN -> vercel link or configure differently
-        run: |
-          npx vercel pull --yes --environment=development --token $VERCEL_TOKEN
-          cat .vercel/.env.development.local
-          npx vercel pull --yes --environment=preview --token $VERCEL_TOKEN
-          cat .vercel/.env.preview.local
-          npx vercel pull --yes --environment=production --token $VERCEL_TOKEN
-          cat .vercel/.env.production.local
-          cat ~/work/cicd-test-deploy/cicd-test-deploy/.vercel/project.json
-      
-      - name: Run Vercel Build
-        run: npx vercel build
+        
+        - name: npm install project dependencies
+          run: npm install
+        
+        - name: Install Vercel CLI
+          run: npm install vercel
+            
+        - name: Run unit tests
+          run: npm test 
   
   # test auto-rebase against main. fail build if rebase conflict occurs
 
   deploy-develop:
     name: Deploy Develop
     runs-on: ubuntu-latest
-    needs: build
-    if: success() # Only deploy if tests passed
-    env:
-      name: develop
+    needs: run-unit-tests
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use node cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          #scope: '@serenaandlily'
+        
       - name: Deploy to Develop
-        run: |
-          echo "Deploying to the Develop environment."
-          //echo "Develop secret is: ${{ secrets.DEVELOP_TEST_KEY }}"
+        run: echo "Deploying to the Develop environment."
+      
+      - name: Pull Vercell environment variables
+        run: npx vercel pull --yes --environment=preview --git-branch=develop --token $VERCEL_TOKEN
+      
+      - name: Run Vercel build
+        run: npx vercel build --token $VERCEL_TOKEN
+      
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
   
-  run-regression:
-    name: Run Regression
+  deploy-staging:
+    name: Deploy Staging
     runs-on: ubuntu-latest
     needs: deploy-develop
-    # name: Run Manual Regression on: workflow_dispatch: inputs: name: choice: drop down with dev or qa
-    if: ${{ github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
+    if: github.ref == 'refs/heads/main' # Only run on main branch
     steps:
-      - name: Checkout Regression Code
+      - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Use node cache
+        uses: actions/setup-node@v3
         with:
-          repository: 'serenaandlily/sl-testing-automation'
-          ref: main  # locally it's on Develop. TODO: check running on main
-          token: $${{ secrets.GITHUB_TOKEN }}
-          path: 'sl-testing-automation'
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          #scope: '@serenaandlily'
+        
+      - name: Deploy to Staging
+        run: echo "Deploying to the Staging environment."
       
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: '11'
+      - name: Pull Vercell environment variables
+        run: npx vercel pull --yes --environment=preview --token $VERCEL_TOKEN
+      
+      - name: Run Vercel build
+        run: npx vercel build --token $VERCEL_TOKEN
+      
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
+  
 
-      - name: Configure Environment
-        run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
-
-      - name: Run Regression Suite
-        run: mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=suites/panel/regression.xml
-
-  deploy-qa:
-    name: Deploy QA
+  deploy-production:
+    name: Deploy Production
     runs-on: ubuntu-latest
-    needs: run-regression
-    env:
-      name: qa
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/main' # Only run on main branch
     steps:
-      - name: Deploy to QA
-        run: |
-          echo "Deploying to the QA environment."
-          echo "QA secret is: ${{ secrets.QA_TEST_KEY }}"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use node cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          #scope: '@serenaandlily'
+        
+      - name: Deploy to Production
+        run: echo "Deploying to the Production environment."
+      
+      - name: Pull Vercell environment variables
+        run: npx vercel pull --yes --environment=production --token $VERCEL_TOKEN
+      
+      - name: Run Vercel build
+        run: npx vercel build --prod --token $VERCEL_TOKEN
+      
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN
