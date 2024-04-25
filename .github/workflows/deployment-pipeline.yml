@@ -48,6 +48,18 @@ jobs:
     env:
       name: develop
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use node cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          #scope: '@serenaandlily'
+        
       - name: Deploy to Develop
         run: echo "Deploying to the Develop environment."
       
@@ -69,6 +81,18 @@ jobs:
     env:
       name: production
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use node cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          #scope: '@serenaandlily'
+        
       - name: Deploy to Production
         run: echo "Deploying to the Production environment."
       
