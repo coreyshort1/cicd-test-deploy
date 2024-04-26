@@ -3,7 +3,7 @@ import React from 'react';
 
 function Home() {
 
-  const welcomeMessage = process.env.WELCOME_MESSAGE || 'Welcome to Local';
+  const welcomeMessage = process.env.NEXT_PUBLIC_WELCOME_MESSAGE || 'Welcome to Local';
 
   return (
     <div>
