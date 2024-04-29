@@ -69,6 +69,9 @@ jobs:
       - name: Deploy to Vercel
         run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
   
+      - name: Alias Vercel develop domain
+        run: npx vercel alias set cicd-test-deploy-develop.vercel.app --token $VERCEL_TOKEN
+
   deploy-staging:
     name: Deploy Staging
     runs-on: ubuntu-latest
@@ -98,7 +101,9 @@ jobs:
       
       - name: Deploy to Vercel
         run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
-  
+      
+      - name: Alias Vercel Staging domain
+        run: npx vercel alias set cicd-test-deploy-staging.vercel.app --token $VERCEL_TOKEN  
 
   deploy-production:
     name: Deploy Production
@@ -129,3 +134,7 @@ jobs:
       
       - name: Deploy to Vercel
         run: npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN
+      
+      - name: Alias Vercel Production domain
+        run: npx vercel alias set cicd-test-deploy.vercel.app --token $VERCEL_TOKEN  
+
