@@ -94,7 +94,7 @@ jobs:
         run: echo "Deploying to the Staging environment."
       
       - name: Pull Vercell environment variables
-        run: npx vercel pull --yes --environment=preview --token $VERCEL_TOKEN
+        run: npx vercel pull --yes --environment=preview --git-branch=staging --token $VERCEL_TOKEN
       
       - name: Run Vercel build
         run: npx vercel build --token $VERCEL_TOKEN
@@ -135,6 +135,3 @@ jobs:
       - name: Deploy to Vercel
         run: npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN
       
-      - name: Alias Vercel Production domain
-        run: npx vercel alias set cicd-test-deploy.vercel.app --token $VERCEL_TOKEN  
-
