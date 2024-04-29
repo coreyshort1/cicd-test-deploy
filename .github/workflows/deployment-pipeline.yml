@@ -63,11 +63,11 @@ jobs:
       - name: Pull Vercell environment variables
         run: npx vercel pull --yes --environment=preview --git-branch=develop --token $VERCEL_TOKEN
       
-      - name: Run Vercel build
-        run: npx vercel build --token $VERCEL_TOKEN
+      #- name: Run Vercel build
+      #  run: npx vercel build --token $VERCEL_TOKEN
       
       - name: Deploy to Vercel
-        run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
+        run: npx vercel deploy --token $VERCEL_TOKEN
   
       - name: Alias Vercel develop domain
         run: npx vercel alias set cicd-test-deploy-develop.vercel.app --token $VERCEL_TOKEN
