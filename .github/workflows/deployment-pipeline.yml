@@ -67,7 +67,7 @@ jobs:
         run: npx vercel build --token $VERCEL_TOKEN
       
       - name: Deploy to Vercel
-        run: npx vercel deploy --token $VERCEL_TOKEN
+        run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
   
       - name: Alias Vercel develop domain
         run: npx vercel alias set cicd-test-deploy-develop.vercel.app --token $VERCEL_TOKEN
@@ -100,7 +100,7 @@ jobs:
         run: npx vercel build --token $VERCEL_TOKEN
       
       - name: Deploy to Vercel
-        run: npx vercel deploy --token $VERCEL_TOKEN
+        run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
       
       - name: Alias Vercel Staging domain
         run: npx vercel alias set cicd-test-deploy-staging.vercel.app --token $VERCEL_TOKEN  
@@ -133,6 +133,6 @@ jobs:
         run: npx vercel build --prod --token $VERCEL_TOKEN
       
       - name: Deploy to Vercel
-        run: npx vercel deploy --prod --token $VERCEL_TOKEN
+        run: npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN
       
   # post github action to tag release
