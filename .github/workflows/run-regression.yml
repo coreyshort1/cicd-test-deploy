@@ -19,6 +19,7 @@ jobs:
     run-regression:
         name: Run Regression
         runs-on: ubuntu-latest
+        # name: Run Manual Regression on: workflow_dispatch: inputs: name: choice: drop down with dev or qa
         steps:
           - name: Checkout Regression Code
             uses: actions/checkout@v3
@@ -45,11 +46,10 @@ jobs:
               restore-keys: |
                 serenaandlily-maven-regression-restore
     
-          #- name: Configure Environment
-          #  run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
+          - name: Configure Environment
+            run: cp src/config/env/env_base_github_secrets.json src/config/env/env_base.json
     
           - name: Run Regression Suite
             working-directory: sl-testing-automation
             run: |
               mkdir -p ./test-output/xml
-              mvn -Dsurefire.rerunFailingTestsCount=2 test -DsuitePath=regression.xml
