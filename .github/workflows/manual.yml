@@ -42,7 +42,7 @@ jobs:
             echo "Approval not granted."
             echo "::set-output name=approved::false"
           fi
-        continue-on-error: false
+        continue-on-error: true
 
   revert-deployment:
     name: Revert Deployment
