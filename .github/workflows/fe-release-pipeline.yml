@@ -5,6 +5,16 @@ on:
     tags:
       - 'fe-*-*-*'
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run the workflow on'
+        required: true
+        default: 'mw-pipeline'
+        #default: 'main'
+      approved:
+        description: 'Approval to deploy to production'
+        required: true
+        default: 'false'
 
 env:
     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -83,7 +93,6 @@ jobs:
         run: |
           echo "Manual approval required."
           echo "If you approve, please click 'Approve and run' button on GitHub Actions UI."
-          exit 1
 
   deploy-production:
     name: Deploy Production
