@@ -11,32 +11,43 @@ on:
         required: true
         #default: 'mw-pipeline'
         default: 'main'
-      approved:
-        description: 'Approval to deploy to production'
-        required: true
-        default: 'false'
 
 env:
     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     VERCEL_STAGING_DOMAIN: serenaandlily-nextjs-staging.vercel.app
     STAGING_TEST: cicd-test-deploy-staging.vercel.app
 
-jobs:     
-  # test tag and manual approval and then revert on different workflow
-  manual-approval:
-    name: Manual Approval
+jobs:
+  wait-for-approval:
+    name: Wait for Manual Approval
     runs-on: ubuntu-latest
+    #needs: deploy-staging
     steps:
-      - name: Manual approval
+      - name: Upload approval request
+        run: echo "Approval request created." > approval.txt
+        
+      - name: Upload Approval Request
+        uses: actions/upload-artifact@v3
+        with:
+          name: approval-request
+          path: approval.txt
+
+      - name: Check for approval
+        id: check_approval
         run: |
-          echo "Manual approval required."
-          echo "If you approve, please click 'Approve and run' button on GitHub Actions UI."
+          if [ -f approval-accepted.txt ]; then
+            echo "Approval granted."
+            echo "::set-output name=approved::true"
+          else
+            echo "Approval not granted."
+            echo "::set-output name=approved::false"
+        continue-on-error: true
 
   revert-deployment:
     name: Revert Deployment
     runs-on: ubuntu-latest
-    needs: manual-approval
-    if: ${{ github.event.inputs.approved != 'true' }}
+    needs: wait-for-approval
+    if: ${{ needs.wait-for-approval.outputs.approved == 'false' }}
     steps:
       - name: Revert last deployment
         run: |

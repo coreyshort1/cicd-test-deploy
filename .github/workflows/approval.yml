@@ -1,0 +1,27 @@
+name: Approval Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      approval:
+        description: 'Approve deployment'
+        required: true
+        type: choice
+        options: ['false', 'true']
+        default: 'false'
+
+jobs:
+  approve:
+    name: Approve Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create approval file
+        if: ${{ github.event.inputs.approval == 'true' }}
+        run: echo "Approval granted." > approval-accepted.txt
+
+      - name: Upload approval artifact
+        if: ${{ github.event.inputs.approval == 'true' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: approval-accepted
+          path: approval-accepted.txt
