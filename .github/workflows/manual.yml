@@ -1,0 +1,44 @@
+name: FE Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'fe-*-*-*'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to run the workflow on'
+        required: true
+        #default: 'mw-pipeline'
+        default: 'main'
+      approved:
+        description: 'Approval to deploy to production'
+        required: true
+        default: 'false'
+
+env:
+    VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    VERCEL_STAGING_DOMAIN: serenaandlily-nextjs-staging.vercel.app
+    STAGING_TEST: cicd-test-deploy-staging.vercel.app
+
+jobs:     
+  # test tag and manual approval and then revert on different workflow
+  manual-approval:
+    name: Manual Approval
+    runs-on: ubuntu-latest
+    steps:
+      - name: Manual approval
+        run: |
+          echo "Manual approval required."
+          echo "If you approve, please click 'Approve and run' button on GitHub Actions UI."
+
+  revert-deployment:
+    name: Revert Deployment
+    runs-on: ubuntu-latest
+    needs: manual-approval
+    if: ${{ github.event.inputs.approved != 'true' }}
+    steps:
+      - name: Revert last deployment
+        run: |
+          echo "Reverting last deployment."
+          # Add revert logic here, such as resetting the git commit or running a Vercel rollback command.
