@@ -1,0 +1,136 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'fe-*-*-*'
+  workflow_dispatch:
+
+env:
+    VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    VERCEL_STAGING_DOMAIN: serenaandlily-nextjs-staging.vercel.app
+    STAGING_TEST: cicd-test-deploy-staging.vercel.app
+
+jobs:
+  run-unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    env:
+        CI: true
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+        
+        - name: Setup and cache node modules
+          uses: actions/setup-node@v3
+          with:
+            node-version: 16
+            #node-version: 18
+            cache: 'npm'
+            cache-dependency-path: package-lock.json
+            registry-url: 'https://npm.pkg.github.com'
+            scope: '@serenaandlily'
+        
+        - name: npm install project dependencies
+          run: npm ci --omit=dev
+        
+        - name: Install Vercel CLI
+          run: npm install vercel
+            
+        - name: Run unit tests
+          run: npm test 
+
+  deploy-staging:
+    name: Deploy Staging
+    runs-on: ubuntu-latest
+    needs: run-unit-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use node cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          #node-version: 18
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@serenaandlily'
+        
+      - name: Deploy to Staging
+        run: echo "Deploying to the Staging environment."
+      
+      - name: Pull Vercell environment variables
+        run: npx vercel pull --yes --environment=preview --git-branch=staging --token $VERCEL_TOKEN
+      
+      - name: Run Vercel build
+        run: npx vercel build --token $VERCEL_TOKEN
+      
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prebuilt --token $VERCEL_TOKEN
+      
+      - name: Alias Vercel Staging domain
+        run: npx vercel alias set $STAGING_TEST --token $VERCEL_TOKEN
+        
+  # test tag and manual approval and then revert on different workflow
+  manual-approval:
+    name: Manual Approval
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    steps:
+      - name: Approval step
+        id: approval
+        uses: hmarr/auto-approve-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CONTINUE: false
+      - name: Manual approval
+        if: ${{ !steps.approval.outputs.approved }}
+        run: |
+          echo "Manual approval required."
+          echo "If you approve, please click 'Approve and run' button on GitHub Actions UI."
+          exit 1
+
+  deploy-production:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: ${{ needs.manual-approval.outputs.approved == 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Use node cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          #node-version: 18
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@serenaandlily'
+        
+      - name: Deploy to Production
+        run: echo "Deploying to the Production environment."
+      
+      - name: Pull Vercell environment variables
+        run: npx vercel pull --yes --environment=production --token $VERCEL_TOKEN
+      
+      - name: Run Vercel build
+        run: npx vercel build --prod --token $VERCEL_TOKEN
+      
+      - name: Deploy to Vercel
+        run: npx vercel deploy --prebuilt --prod --token $VERCEL_TOKEN
+
+  revert-deployment:
+    name: Revert Deployment
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, manual-approval]
+    if: ${{ needs.manual-approval.outputs.approved != 'true' }}
+    steps:
+      - name: Revert last deployment
+        run: |
+          echo "Reverting last deployment."
+          # Add your revert logic here, such as resetting the git commit or running a Vercel rollback command.

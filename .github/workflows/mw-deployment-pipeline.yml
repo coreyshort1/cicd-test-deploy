@@ -1,0 +1,79 @@
+name: MW Release Pipeline
+
+on:
+  push:
+    branches:
+      #- main
+      - test
+   
+env:
+  AWS_ENV: ${{ startsWith(github.ref_name, 'bugfix/') && 'develop' || startsWith(github.ref_name, 'feature/') && 'qa' || '' }}
+  
+  AWS_ACCESS_KEY_ID_KEYNAME: AWS_ACCESS_KEY_ID_${{ startsWith(github.ref_name, 'bugfix/') && 'develop' || startsWith(github.ref_name, 'feature/') && 'qa' || '' }}
+  
+  AWS_SECRET_ACCESS_KEY_KEYNAME: AWS_SECRET_ACCESS_KEY_${{ startsWith(github.ref_name, 'bugfix/') && 'develop' || startsWith(github.ref_name, 'feature/') && 'qa' || '' }}
+  
+  AWS_S3_DEPLOY_BUCKET: lambda-deployables-east-${{ startsWith(github.ref_name, 'bugfix/') && 'develop' || startsWith(github.ref_name, 'feature/') && 'qa' || '' }}
+
+jobs:
+  run-unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    env:
+        CI: true
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+        
+        - name: Setup and cache node modules
+          uses: actions/setup-node@v3
+          with:
+            node-version: 20
+            cache: 'npm'
+            cache-dependency-path: package-lock.json
+            registry-url: 'https://npm.pkg.github.com'
+            scope: '@serenaandlily'
+        
+        - name: npm install project dependencies
+          run: npm ci --omit=dev
+            
+        - name: Run unit tests
+          run: npm test
+    
+  deploy_middleware:
+    name: Build and deploy lambda
+    needs: run-unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        
+      - name: create tmp deploy folder
+        run: mkdir -p ./build/lambda
+      
+      - name: zip
+        uses: montudor/action-zip@v0.1.0
+        with:
+          args: zip -qq -r ./build/lambda/ecp-middleware-resolver-${{ env.AWS_ENV }}.zip ./
+    
+      - name: deploy zip to s3
+        uses: shallwefootball/upload-s3-action@master
+        id: S3
+        with:
+          aws_key_id: ${{secrets[env.AWS_ACCESS_KEY_ID_KEYNAME]}}
+          aws_secret_access_key: ${{secrets[env.AWS_SECRET_ACCESS_KEY_KEYNAME]}}
+          aws_bucket: ${{env.AWS_S3_DEPLOY_BUCKET }}
+          source_dir: './build/lambda/'
+      
+      - name: debug
+        run: echo ${{steps.S3.outputs.object_key}}
+      
+      - name: default deploy
+        uses: appleboy/lambda-action@master
+        with:
+            aws_access_key_id: ${{secrets[env.AWS_ACCESS_KEY_ID_KEYNAME]}}
+            aws_secret_access_key: ${{secrets[env.AWS_SECRET_ACCESS_KEY_KEYNAME]}}
+            aws_region: us-east-1
+            function_name: ecp-middleware-resolver-${{ env.AWS_ENV }}
+            s3_bucket: ${{env.AWS_S3_DEPLOY_BUCKET }}
+            s3_key: ${{steps.S3.outputs.object_key}}/ecp-middleware-resolver-${{ env.AWS_ENV }}.zip
+            debug: true
