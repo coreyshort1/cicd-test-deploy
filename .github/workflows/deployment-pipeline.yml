@@ -34,9 +34,7 @@ jobs:
     
     - name: Fail if behind main
       if: steps.check_behind.outputs.behind == 'true'
-      run: |
-        echo "Your branch is behind the main branch. Please rebase your changes."
-        exit 1
+      run: exit 1
 
 
   run-unit-tests:
