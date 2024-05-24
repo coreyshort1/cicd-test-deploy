@@ -4,15 +4,43 @@ on:
   push:
     branches:
       - main
-      #- feature/*
+      - feature/*
       - fix/*
 
 #env:
 #    NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
 jobs:
+  check-behind-main:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Fetch all branches
+      run: git fetch origin
+    
+    - name: Check if branch is behind main
+      id: check_behind
+      run: |
+        if git merge-base --is-ancestor origin/main HEAD; then
+          echo "Branch is up to date with main."
+          echo "::set-output name=behind::false"
+        else
+          echo "Your branch is behind the main branch. Please rebase your changes.""
+          echo "::set-output name=behind::true"
+        fi
+    
+    - name: Fail if behind main
+      if: steps.check_behind.outputs.behind == 'true'
+      run: |
+        echo "Your branch is behind the main branch. Please rebase your changes."
+        exit 1
+
+
   run-unit-tests:
     name: Run Unit Tests
+    needs: check-behind-main
     runs-on: ubuntu-latest
     env:
         CI: true

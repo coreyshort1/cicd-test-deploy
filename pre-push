@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Fetch the latest commits from the remote repository
+git fetch origin
+
+# Check if the current branch is behind the main branch
+if git merge-base --is-ancestor origin/main HEAD; then
+    echo "Branch is up to date with main."
+else
+    echo "Branch is behind main."
+    exit 1  # Exit with a non-zero status to prevent the push
+fi
+
