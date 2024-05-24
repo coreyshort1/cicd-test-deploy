@@ -12,6 +12,7 @@ on:
 
 jobs:
   check-behind-main:
+    name: Check Behind Main
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -27,7 +28,7 @@ jobs:
           echo "Branch is up to date with main."
           echo "::set-output name=behind::false"
         else
-          echo "Your branch is behind the main branch. Please rebase your changes.""
+          echo "Your branch is behind the main branch. Please rebase your changes."
           echo "::set-output name=behind::true"
         fi
     
