@@ -3,8 +3,8 @@ name: Deploy Develop
 on:
   push:
     branches:
-      #- main
-      - mw-pipeline-2
+      - main
+      #- mw-pipeline-2
 
 env:
     VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -41,7 +41,7 @@ jobs:
   
   deploy-develop:
     name: Deploy Develop
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: run-unit-tests
     steps:
       - name: Checkout code
